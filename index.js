@@ -1,251 +1,437 @@
-/*
-const http = require('http');
-const port = process.env.PORT || 3000;
-
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  const msg = 'Hello Thinh!\n';
-  console.log(req.headers);
-  /!*var request = require('request');
-  var options = {
-    'method': 'POST',
-    'url': 'https://account.b29.win/Api/Account/LoginMobile',
-    'headers': {
-      'accept': ' *!/!*',
-      'accept-encoding': ' gzip, deflate, br',
-      'accept-language': ' vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
-      'cache-control': ' no-cache',
-      'content-length': ' 125',
-      'content-type': ' application/json; charset=UTF-8',
-      'cookie': ' _ga=GA1.2.154339168.1628910930; _gid=GA1.2.1069828179.1629473961',
-      'origin': ' https://b29.win',
-      'pragma': ' no-cache',
-      'referer': ' https://b29.win/',
-      'sec-ch-ua': ' "Chromium";v="92", " Not A;Brand";v="99", "Google Chrome";v="92"',
-      'sec-ch-ua-mobile': ' ?0',
-      'sec-fetch-dest': ' empty',
-      'sec-fetch-mode': ' cors',
-      'sec-fetch-site': ' same-site',
-      'user-agent': ' Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36'
-    },
-    body: '{"PasswordMd5":"a5fdc692d22754026ada0f135ebf4070","Username":"toponly","Captcha":"","Verify":null,"ServiceId":1,"SourceId":1}'
-
-  };
-  request(options, function (error, response) {
-    if (error) throw new Error(error);
-    // console.log(response.headers);
-    console.log("------------------------")
-  });
-*!/
-
-  res.end(msg);
-});
-
-server.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}/`);
-});*/
+wss = require('./txWs');
 console.log("Server started");
-var Msg = '';
-var WebSocketServer = require('ws').Server
-    , wss = new WebSocketServer({port: 8010});
-wss.on('connection', function (ws, req) {
-    // console.log(req);
-    ws.send(JSON.stringify({"C": "d-87022C60-C,76|Qf,0|Qg,0|Qh,1", "S": 1, "M": []}));
-    ws.on('message', function (message) {
-        ws.send(JSON.stringify({"C": "d-87022C60-C,76|Qf,0|Qg,0|Qh,2", "M": []}));
-        console.log('Received from client: %s', message);
-        let json = JSON.parse(message);
-        if (json.M === 'getCurrentRooms') {
-            ws.send(JSON.stringify({
-                "C": "d-87022C60-C,76|Qf,2|Qg,0|Qh,3|S,47C",
-                "M": [{
-                    "H": "miniGameTXHub",
-                    "M": "currentRoomsInfo",
-                    "A": [[{
-                        "BetType": 1,
-                        "TotalAccount1": 97,
-                        "TotalBetValue1": 38645420,
-                        "TotalAccount2": 99,
-                        "TotalBetValue2": 59022000,
-                        "IsChanged": true
-                    }]]
-                }, {
-                    "H": "miniGameTXHub",
-                    "M": "currentSession",
-                    "A": [{
-                        "GameSessionID": 4478149,
-                        "GameStatus": 1,
-                        "RemainWaiting": 0,
-                        "RemainBetting": 53,
-                        "NextGameSessionID": 0
+var WebSocketServer = require('ws').Server;
+var txWs = new WebSocketServer({port: 8010});
+txWs.on('connection', function (ws, req) {
+    const pathname = req.url;
+    if (pathname.startsWith("/tx/")) {
+        ws.send(JSON.stringify({"C": "d-87022C60-C,76|Qf,0|Qg,0|Qh,1", "S": 1, "M": []}));
+        ws.on('message', function (message) {
+            ws.send(JSON.stringify({"C": "d-87022C60-C,76|Qf,0|Qg,0|Qh,2", "M": []}));
+            console.log('Received from client: %s', message);
+            let json = JSON.parse(message);
+            if (json.M === 'getCurrentRooms') {
+                ws.send(JSON.stringify({
+                    "C": "d-87022C60-C,76|Qf,2|Qg,0|Qh,3|S,47C",
+                    "M": [{
+                        "H": "miniGameTXHub",
+                        "M": "currentRoomsInfo",
+                        "A": [[{
+                            "BetType": 1,
+                            "TotalAccount1": 97,
+                            "TotalBetValue1": 38645420,
+                            "TotalAccount2": 99,
+                            "TotalBetValue2": 59022000,
+                            "IsChanged": true
+                        }]]
+                    }, {
+                        "H": "miniGameTXHub",
+                        "M": "currentSession",
+                        "A": [{
+                            "GameSessionID": 4478149,
+                            "GameStatus": 1,
+                            "RemainWaiting": 0,
+                            "RemainBetting": 53,
+                            "NextGameSessionID": 0
+                        }]
                     }]
-                }]
-            }));
-        }
-        if (json.M === 'GetCurrentResult') {
-            ws.send(JSON.stringify({
-                "C": "d-87022C60-C,76|Qf,0|Qg,0|Qh,3|S,47C",
-                "G": "Z6XJhout7YES8p4SzGz3kWnmN1V5hV+g4C2a2ArbaaZsLgXc46EUPofXQ7RHYSsNKHkvi4rkdKKzIViWDEjwmYoKdaqobHXB+5DCFSHbIJzotkllb8hOdMBwRl4Me72AjSsCQg==",
-                "M": []
-            }));
-            ws.send(JSON.stringify({
-                "C": "d-87022C60-C,76|Qf,3|Qg,0|Qh,3|S,47C", "M": [{
-                    "H": "miniGameTXHub",
-                    "M": "gameHistory",
-                    "A": [[{
-                        "GameSessionID": 4478148,
-                        "DiceSum": 13,
-                        "Dice1": 5,
-                        "Dice2": 6,
-                        "Dice3": 2,
-                        "LocationIDWin": 2
+                }));
+            }
+            if (json.M === 'GetCurrentResult') {
+                ws.send(JSON.stringify({
+                    "C": "d-87022C60-C,76|Qf,0|Qg,0|Qh,3|S,47C",
+                    "G": "Z6XJhout7YES8p4SzGz3kWnmN1V5hV+g4C2a2ArbaaZsLgXc46EUPofXQ7RHYSsNKHkvi4rkdKKzIViWDEjwmYoKdaqobHXB+5DCFSHbIJzotkllb8hOdMBwRl4Me72AjSsCQg==",
+                    "M": []
+                }));
+                ws.send(JSON.stringify({
+                    "C": "d-87022C60-C,76|Qf,3|Qg,0|Qh,3|S,47C", "M": [{
+                        "H": "miniGameTXHub",
+                        "M": "gameHistory",
+                        "A": [[{
+                            "GameSessionID": 4478148,
+                            "DiceSum": 13,
+                            "Dice1": 5,
+                            "Dice2": 6,
+                            "Dice3": 2,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478147,
+                            "DiceSum": 14,
+                            "Dice1": 4,
+                            "Dice2": 4,
+                            "Dice3": 6,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478146,
+                            "DiceSum": 12,
+                            "Dice1": 3,
+                            "Dice2": 3,
+                            "Dice3": 6,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478145,
+                            "DiceSum": 16,
+                            "Dice1": 6,
+                            "Dice2": 5,
+                            "Dice3": 5,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478144,
+                            "DiceSum": 9,
+                            "Dice1": 2,
+                            "Dice2": 4,
+                            "Dice3": 3,
+                            "LocationIDWin": 1
+                        }, {
+                            "GameSessionID": 4478143,
+                            "DiceSum": 12,
+                            "Dice1": 1,
+                            "Dice2": 5,
+                            "Dice3": 6,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478142,
+                            "DiceSum": 10,
+                            "Dice1": 3,
+                            "Dice2": 5,
+                            "Dice3": 2,
+                            "LocationIDWin": 1
+                        }, {
+                            "GameSessionID": 4478141,
+                            "DiceSum": 11,
+                            "Dice1": 5,
+                            "Dice2": 2,
+                            "Dice3": 4,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478140,
+                            "DiceSum": 9,
+                            "Dice1": 4,
+                            "Dice2": 1,
+                            "Dice3": 4,
+                            "LocationIDWin": 1
+                        }, {
+                            "GameSessionID": 4478139,
+                            "DiceSum": 14,
+                            "Dice1": 4,
+                            "Dice2": 5,
+                            "Dice3": 5,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478138,
+                            "DiceSum": 12,
+                            "Dice1": 5,
+                            "Dice2": 1,
+                            "Dice3": 6,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478137,
+                            "DiceSum": 6,
+                            "Dice1": 1,
+                            "Dice2": 3,
+                            "Dice3": 2,
+                            "LocationIDWin": 1
+                        }, {
+                            "GameSessionID": 4478136,
+                            "DiceSum": 12,
+                            "Dice1": 1,
+                            "Dice2": 5,
+                            "Dice3": 6,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478135,
+                            "DiceSum": 13,
+                            "Dice1": 3,
+                            "Dice2": 6,
+                            "Dice3": 4,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478134,
+                            "DiceSum": 12,
+                            "Dice1": 4,
+                            "Dice2": 5,
+                            "Dice3": 3,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478133,
+                            "DiceSum": 11,
+                            "Dice1": 1,
+                            "Dice2": 5,
+                            "Dice3": 5,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478132,
+                            "DiceSum": 8,
+                            "Dice1": 2,
+                            "Dice2": 4,
+                            "Dice3": 2,
+                            "LocationIDWin": 1
+                        }, {
+                            "GameSessionID": 4478131,
+                            "DiceSum": 11,
+                            "Dice1": 3,
+                            "Dice2": 4,
+                            "Dice3": 4,
+                            "LocationIDWin": 2
+                        }, {
+                            "GameSessionID": 4478130,
+                            "DiceSum": 9,
+                            "Dice1": 4,
+                            "Dice2": 3,
+                            "Dice3": 2,
+                            "LocationIDWin": 1
+                        }, {
+                            "GameSessionID": 4478129,
+                            "DiceSum": 6,
+                            "Dice1": 2,
+                            "Dice2": 2,
+                            "Dice3": 2,
+                            "LocationIDWin": 1
+                        }]]
+                    }]
+                }));
+                ws.send(JSON.stringify({
+                    "C": "d-87022C60-C,76|Qf,5|Qg,0|Qh,3|S,47C",
+                    "M": [{"H": "miniGameTXHub", "M": "resultOfDragon", "A": [{"IsWin": false, "count": 0}]}]
+                }));
+            }
+            if (json.M === 'GetAccountResult') {
+                ws.send(JSON.stringify({
+                    "C": "d-AF644E6C-B,AAA|DsD,24|DsE,0|DsF,3|O,6A52",
+                    "M": [{"H": "miniGameTXHub", "M": "resultOfAccount", "A": [[]]}]
+                }));
+                ws.send(JSON.stringify({"I": "32"}));
+            }
+            let sec = 60, unitP = 10, unitM = 2100000;
+            let t1 = 99, t2 = 106, b1 = 38645420, b2 = 59022000;
+            setInterval(function () {
+                if (sec === 0) {
+                    ws.send(JSON.stringify({
+                        "C": "d-AF644E6C-B,AAB|DsD,24|DsE,0|DsF,3|O,6A53",
+                        "M": [{
+                            "H": "miniGameTXHub",
+                            "M": "currentSession",
+                            "A": [{
+                                "GameSessionID": 4480325,
+                                "GameStatus": 1,
+                                "RemainWaiting": 0,
+                                "RemainBetting": 60,
+                                "NextGameSessionID": 0
+                            }]
+                        }, {
+                            "H": "miniGameTXHub",
+                            "M": "currentRoomsInfo",
+                            "A": [[{
+                                "BetType": 1,
+                                "TotalAccount1": 0,
+                                "TotalBetValue1": 0,
+                                "TotalAccount2": 0,
+                                "TotalBetValue2": 0,
+                                "IsChanged": true
+                            }]]
+                        }]
+                    }));
+                    ws.send(JSON.stringify({
+                        "C": "d-AF644E6C-B,AAB|DsD,24|DsE,0|DsF,3|O,6A54", "M": [{
+                            "H": "miniGameTXHub",
+                            "M": "gameHistory",
+                            "A": [[{
+                                "GameSessionID": 4480324,
+                                "DiceSum": 11,
+                                "Dice1": 4,
+                                "Dice2": 5,
+                                "Dice3": 2,
+                                "LocationIDWin": 2
+                            }, {
+                                "GameSessionID": 4480323,
+                                "DiceSum": 8,
+                                "Dice1": 2,
+                                "Dice2": 3,
+                                "Dice3": 3,
+                                "LocationIDWin": 1
+                            }, {
+                                "GameSessionID": 4480322,
+                                "DiceSum": 14,
+                                "Dice1": 2,
+                                "Dice2": 6,
+                                "Dice3": 6,
+                                "LocationIDWin": 2
+                            }, {
+                                "GameSessionID": 4480321,
+                                "DiceSum": 9,
+                                "Dice1": 3,
+                                "Dice2": 1,
+                                "Dice3": 5,
+                                "LocationIDWin": 1
+                            }, {
+                                "GameSessionID": 4480320,
+                                "DiceSum": 6,
+                                "Dice1": 1,
+                                "Dice2": 2,
+                                "Dice3": 3,
+                                "LocationIDWin": 1
+                            }, {
+                                "GameSessionID": 4480319,
+                                "DiceSum": 7,
+                                "Dice1": 2,
+                                "Dice2": 2,
+                                "Dice3": 3,
+                                "LocationIDWin": 1
+                            }, {
+                                "GameSessionID": 4480318,
+                                "DiceSum": 11,
+                                "Dice1": 2,
+                                "Dice2": 4,
+                                "Dice3": 5,
+                                "LocationIDWin": 2
+                            }, {
+                                "GameSessionID": 4480317,
+                                "DiceSum": 10,
+                                "Dice1": 3,
+                                "Dice2": 3,
+                                "Dice3": 4,
+                                "LocationIDWin": 1
+                            }, {
+                                "GameSessionID": 4480316,
+                                "DiceSum": 11,
+                                "Dice1": 5,
+                                "Dice2": 5,
+                                "Dice3": 1,
+                                "LocationIDWin": 2
+                            }, {
+                                "GameSessionID": 4480315,
+                                "DiceSum": 16,
+                                "Dice1": 6,
+                                "Dice2": 6,
+                                "Dice3": 4,
+                                "LocationIDWin": 2
+                            }, {
+                                "GameSessionID": 4480314,
+                                "DiceSum": 18,
+                                "Dice1": 6,
+                                "Dice2": 6,
+                                "Dice3": 6,
+                                "LocationIDWin": 2
+                            }, {
+                                "GameSessionID": 4480313,
+                                "DiceSum": 11,
+                                "Dice1": 6,
+                                "Dice2": 2,
+                                "Dice3": 3,
+                                "LocationIDWin": 2
+                            }, {
+                                "GameSessionID": 4480312,
+                                "DiceSum": 12,
+                                "Dice1": 5,
+                                "Dice2": 4,
+                                "Dice3": 3,
+                                "LocationIDWin": 2
+                            }, {
+                                "GameSessionID": 4480311,
+                                "DiceSum": 7,
+                                "Dice1": 2,
+                                "Dice2": 3,
+                                "Dice3": 2,
+                                "LocationIDWin": 1
+                            }, {
+                                "GameSessionID": 4480310,
+                                "DiceSum": 10,
+                                "Dice1": 5,
+                                "Dice2": 3,
+                                "Dice3": 2,
+                                "LocationIDWin": 1
+                            }, {
+                                "GameSessionID": 4480309,
+                                "DiceSum": 8,
+                                "Dice1": 5,
+                                "Dice2": 1,
+                                "Dice3": 2,
+                                "LocationIDWin": 1
+                            }, {
+                                "GameSessionID": 4480308,
+                                "DiceSum": 11,
+                                "Dice1": 2,
+                                "Dice2": 4,
+                                "Dice3": 5,
+                                "LocationIDWin": 2
+                            }, {
+                                "GameSessionID": 4480307,
+                                "DiceSum": 11,
+                                "Dice1": 3,
+                                "Dice2": 4,
+                                "Dice3": 4,
+                                "LocationIDWin": 2
+                            }, {
+                                "GameSessionID": 4480306,
+                                "DiceSum": 11,
+                                "Dice1": 2,
+                                "Dice2": 4,
+                                "Dice3": 5,
+                                "LocationIDWin": 2
+                            }, {
+                                "GameSessionID": 4480305,
+                                "DiceSum": 8,
+                                "Dice1": 3,
+                                "Dice2": 1,
+                                "Dice3": 4,
+                                "LocationIDWin": 1
+                            }]]
+                        }]
+                    }));
+                    ws.send(JSON.stringify({
+                        "C": "d-AF644E6C-B,AAB|DsD,24|DsE,0|DsF,3|O,6A55",
+                        "M": [{
+                            "H": "miniGameTXHub",
+                            "M": "currentRoomsInfo",
+                            "A": [[{
+                                "BetType": 1,
+                                "TotalAccount1": 0,
+                                "TotalBetValue1": 0,
+                                "TotalAccount2": 0,
+                                "TotalBetValue2": 0,
+                                "IsChanged": true
+                            }]]
+                        }]
+                    }));
+                    ws.send(JSON.stringify({}));
+                    ws.send(JSON.stringify({
+                        "C": "d-AD81F117-B,B37|EHu,7|EHv,0|EHw,4|F,6FEE",
+                        "M": [{
+                            "H": "miniGameTXHub",
+                            "M": "currentResult",
+                            "A": [{"Dice1": 2, "Dice2": 5, "Dice3": 1, "LocationIDWin": 1}]
+                        }]
+                    }));
+                    sec = 60;
+                }
+
+                ws.send(JSON.stringify({
+                    "C": "d-87022C60-C,76|Qf,2|Qg,0|Qh,3|S,47C",
+                    "M": [{
+                        "H": "miniGameTXHub",
+                        "M": "currentRoomsInfo",
+                        "A": [[{
+                            "BetType": 1,
+                            "TotalAccount1": t1 += unitP,
+                            "TotalBetValue1": b1 += unitM,
+                            "TotalAccount2": t2 += unitP,
+                            "TotalBetValue2": b2 += unitM,
+                            "IsChanged": true
+                        }]]
                     }, {
-                        "GameSessionID": 4478147,
-                        "DiceSum": 14,
-                        "Dice1": 4,
-                        "Dice2": 4,
-                        "Dice3": 6,
-                        "LocationIDWin": 2
-                    }, {
-                        "GameSessionID": 4478146,
-                        "DiceSum": 12,
-                        "Dice1": 3,
-                        "Dice2": 3,
-                        "Dice3": 6,
-                        "LocationIDWin": 2
-                    }, {
-                        "GameSessionID": 4478145,
-                        "DiceSum": 16,
-                        "Dice1": 6,
-                        "Dice2": 5,
-                        "Dice3": 5,
-                        "LocationIDWin": 2
-                    }, {
-                        "GameSessionID": 4478144,
-                        "DiceSum": 9,
-                        "Dice1": 2,
-                        "Dice2": 4,
-                        "Dice3": 3,
-                        "LocationIDWin": 1
-                    }, {
-                        "GameSessionID": 4478143,
-                        "DiceSum": 12,
-                        "Dice1": 1,
-                        "Dice2": 5,
-                        "Dice3": 6,
-                        "LocationIDWin": 2
-                    }, {
-                        "GameSessionID": 4478142,
-                        "DiceSum": 10,
-                        "Dice1": 3,
-                        "Dice2": 5,
-                        "Dice3": 2,
-                        "LocationIDWin": 1
-                    }, {
-                        "GameSessionID": 4478141,
-                        "DiceSum": 11,
-                        "Dice1": 5,
-                        "Dice2": 2,
-                        "Dice3": 4,
-                        "LocationIDWin": 2
-                    }, {
-                        "GameSessionID": 4478140,
-                        "DiceSum": 9,
-                        "Dice1": 4,
-                        "Dice2": 1,
-                        "Dice3": 4,
-                        "LocationIDWin": 1
-                    }, {
-                        "GameSessionID": 4478139,
-                        "DiceSum": 14,
-                        "Dice1": 4,
-                        "Dice2": 5,
-                        "Dice3": 5,
-                        "LocationIDWin": 2
-                    }, {
-                        "GameSessionID": 4478138,
-                        "DiceSum": 12,
-                        "Dice1": 5,
-                        "Dice2": 1,
-                        "Dice3": 6,
-                        "LocationIDWin": 2
-                    }, {
-                        "GameSessionID": 4478137,
-                        "DiceSum": 6,
-                        "Dice1": 1,
-                        "Dice2": 3,
-                        "Dice3": 2,
-                        "LocationIDWin": 1
-                    }, {
-                        "GameSessionID": 4478136,
-                        "DiceSum": 12,
-                        "Dice1": 1,
-                        "Dice2": 5,
-                        "Dice3": 6,
-                        "LocationIDWin": 2
-                    }, {
-                        "GameSessionID": 4478135,
-                        "DiceSum": 13,
-                        "Dice1": 3,
-                        "Dice2": 6,
-                        "Dice3": 4,
-                        "LocationIDWin": 2
-                    }, {
-                        "GameSessionID": 4478134,
-                        "DiceSum": 12,
-                        "Dice1": 4,
-                        "Dice2": 5,
-                        "Dice3": 3,
-                        "LocationIDWin": 2
-                    }, {
-                        "GameSessionID": 4478133,
-                        "DiceSum": 11,
-                        "Dice1": 1,
-                        "Dice2": 5,
-                        "Dice3": 5,
-                        "LocationIDWin": 2
-                    }, {
-                        "GameSessionID": 4478132,
-                        "DiceSum": 8,
-                        "Dice1": 2,
-                        "Dice2": 4,
-                        "Dice3": 2,
-                        "LocationIDWin": 1
-                    }, {
-                        "GameSessionID": 4478131,
-                        "DiceSum": 11,
-                        "Dice1": 3,
-                        "Dice2": 4,
-                        "Dice3": 4,
-                        "LocationIDWin": 2
-                    }, {
-                        "GameSessionID": 4478130,
-                        "DiceSum": 9,
-                        "Dice1": 4,
-                        "Dice2": 3,
-                        "Dice3": 2,
-                        "LocationIDWin": 1
-                    }, {
-                        "GameSessionID": 4478129,
-                        "DiceSum": 6,
-                        "Dice1": 2,
-                        "Dice2": 2,
-                        "Dice3": 2,
-                        "LocationIDWin": 1
-                    }]]
-                }]
-            }));
-            ws.send(JSON.stringify({
-                "C": "d-87022C60-C,76|Qf,5|Qg,0|Qh,3|S,47C",
-                "M": [{"H": "miniGameTXHub", "M": "resultOfDragon", "A": [{"IsWin": false, "count": 0}]}]
-            }));
-        }
-        setInterval(function () {
-            /*ws.send(JSON.stringify({"C":"d-87022C60-C,2D|Lc,0|Ld,0|Le,3|S,1AA","G":"XOVnhHBAMWy+DYRabqIBA4xjHc89QWd6TeVmmm+F2OD2I5R47tAX0VfL1VVNW7A5Z4Sz7YI8rAKIVx6Ym174tZNU0QJwAFMBzm/kQovqaFEty9MfyDbpyK1T1KyKuFTC9+kHpA==","M":[]}));
-            ws.send(JSON.stringify({"C":"d-87022C60-C,2E|Lc,6|Ld,0|Le,3|S,1AC","M":[{"H":"miniGameTXHub","M":"gameHistory","A":[[{"GameSessionID":4478124,"DiceSum":7,"Dice1":2,"Dice2":1,"Dice3":4,"LocationIDWin":1},{"GameSessionID":4478123,"DiceSum":13,"Dice1":1,"Dice2":6,"Dice3":6,"LocationIDWin":2},{"GameSessionID":4478122,"DiceSum":10,"Dice1":4,"Dice2":5,"Dice3":1,"LocationIDWin":1},{"GameSessionID":4478121,"DiceSum":11,"Dice1":4,"Dice2":3,"Dice3":4,"LocationIDWin":2},{"GameSessionID":4478120,"DiceSum":15,"Dice1":5,"Dice2":6,"Dice3":4,"LocationIDWin":2},{"GameSessionID":4478119,"DiceSum":10,"Dice1":2,"Dice2":6,"Dice3":2,"LocationIDWin":1},{"GameSessionID":4478118,"DiceSum":9,"Dice1":1,"Dice2":3,"Dice3":5,"LocationIDWin":1},{"GameSessionID":4478117,"DiceSum":11,"Dice1":5,"Dice2":3,"Dice3":3,"LocationIDWin":2},{"GameSessionID":4478116,"DiceSum":9,"Dice1":3,"Dice2":2,"Dice3":4,"LocationIDWin":1},{"GameSessionID":4478115,"DiceSum":9,"Dice1":4,"Dice2":2,"Dice3":3,"LocationIDWin":1},{"GameSessionID":4478114,"DiceSum":13,"Dice1":6,"Dice2":1,"Dice3":6,"LocationIDWin":2},{"GameSessionID":4478113,"DiceSum":10,"Dice1":4,"Dice2":3,"Dice3":3,"LocationIDWin":1},{"GameSessionID":4478112,"DiceSum":16,"Dice1":5,"Dice2":5,"Dice3":6,"LocationIDWin":2},{"GameSessionID":4478111,"DiceSum":11,"Dice1":3,"Dice2":2,"Dice3":6,"LocationIDWin":2},{"GameSessionID":4478110,"DiceSum":13,"Dice1":4,"Dice2":3,"Dice3":6,"LocationIDWin":2},{"GameSessionID":4478109,"DiceSum":9,"Dice1":2,"Dice2":3,"Dice3":4,"LocationIDWin":1},{"GameSessionID":4478108,"DiceSum":10,"Dice1":5,"Dice2":2,"Dice3":3,"LocationIDWin":1},{"GameSessionID":4478107,"DiceSum":13,"Dice1":5,"Dice2":3,"Dice3":5,"LocationIDWin":2},{"GameSessionID":4478106,"DiceSum":13,"Dice1":6,"Dice2":2,"Dice3":5,"LocationIDWin":2},{"GameSessionID":4478105,"DiceSum":7,"Dice1":1,"Dice2":2,"Dice3":4,"LocationIDWin":1}]]}]}));
-            ws.send(JSON.stringify({"H":"minigametxhub","M":"GetAccountResult","A":[4478125],"I":2}));
-            ws.send(JSON.stringify({"C":"d-87022C60-C,2E|Lc,7|Ld,0|Le,3|S,1AC","M":[{"H":"miniGameTXHub","M":"resultOfAccount","A":[[]]}]}));
-            ws.send(JSON.stringify({"I":"2"}));*/
+                        "H": "miniGameTXHub",
+                        "M": "currentSession",
+                        "A": [{
+                            "GameSessionID": 4478149,
+                            "GameStatus": 1,
+                            "RemainWaiting": 0,
+                            "RemainBetting": sec -= 1,
+                            "NextGameSessionID": 0
+                        }]
+                    }]
+                }));
+            }, 1000, ws, sec);
+            // ws.send('Server received from client: ' + message);
             ws.send(JSON.stringify({
                 "C": "d-34DA4CAC-B,C37|fP,46|fQ,0|fR,3|F,7445",
                 "M": [{
@@ -261,30 +447,21 @@ wss.on('connection', function (ws, req) {
                     }]]
                 }]
             }));
-        }, 1000, ws);
-        ws.send('Server received from client: ' + message);
-        /*23:13:23.273
-        {"C":"d-87022C60-C,2E|Lc,6|Ld,0|Le,3|S,1AC","M":[{"H":"miniGameTXHub","M":"gameHistory","A":[[{"GameSessionID":4478124,"DiceSum":7,"Dice1":2,"Dice2":1,"Dice3":4,"LocationIDWin":1},{"GameSessionID":4478123,"DiceSum":13,"Dice1":1,"Dice2":6,"Dice3":6,"LocationIDWin":2},{"GameSessionID":4478122,"DiceSum":10,"Dice1":4,"Dice2":5,"Dice3":1,"LocationIDWin":1},{"GameSessionID":4478121,"DiceSum":11,"Dice1":4,"Dice2":3,"Dice3":4,"LocationIDWin":2},{"GameSessionID":4478120,"DiceSum":15,"Dice1":5,"Dice2":6,"Dice3":4,"LocationIDWin":2},{"GameSessionID":4478119,"DiceSum":10,"Dice1":2,"Dice2":6,"Dice3":2,"LocationIDWin":1},{"GameSessionID":4478118,"DiceSum":9,"Dice1":1,"Dice2":3,"Dice3":5,"LocationIDWin":1},{"GameSessionID":4478117,"DiceSum":11,"Dice1":5,"Dice2":3,"Dice3":3,"LocationIDWin":2},{"GameSessionID":4478116,"DiceSum":9,"Dice1":3,"Dice2":2,"Dice3":4,"LocationIDWin":1},{"GameSessionID":4478115,"DiceSum":9,"Dice1":4,"Dice2":2,"Dice3":3,"LocationIDWin":1},{"GameSessionID":4478114,"DiceSum":13,"Dice1":6,"Dice2":1,"Dice3":6,"LocationIDWin":2},{"GameSessionID":4478113,"DiceSum":10,"Dice1":4,"Dice2":3,"Dice3":3,"LocationIDWin":1},{"GameSessionID":4478112,"DiceSum":16,"Dice1":5,"Dice2":5,"Dice3":6,"LocationIDWin":2},{"GameSessionID":4478111,"DiceSum":11,"Dice1":3,"Dice2":2,"Dice3":6,"LocationIDWin":2},{"GameSessionID":4478110,"DiceSum":13,"Dice1":4,"Dice2":3,"Dice3":6,"LocationIDWin":2},{"GameSessionID":4478109,"DiceSum":9,"Dice1":2,"Dice2":3,"Dice3":4,"LocationIDWin":1},{"GameSessionID":4478108,"DiceSum":10,"Dice1":5,"Dice2":2,"Dice3":3,"LocationIDWin":1},{"GameSessionID":4478107,"DiceSum":13,"Dice1":5,"Dice2":3,"Dice3":5,"LocationIDWin":2},{"GameSessionID":4478106,"DiceSum":13,"Dice1":6,"Dice2":2,"Dice3":5,"LocationIDWin":2},{"GameSessionID":4478105,"DiceSum":7,"Dice1":1,"Dice2":2,"Dice3":4,"LocationIDWin":1}]]}]}	1832
-        23:13:23.279
-        {"H":"minigametxhub","M":"GetAccountResult","A":[4478125],"I":2}	64
-        23:13:24.268
-        {"C":"d-87022C60-C,2E|Lc,7|Ld,0|Le,3|S,1AC","M":[{"H":"miniGameTXHub","M":"resultOfAccount","A":[[]]}]}	103
-        23:13:24.500
-        {"I":"2"}*/
-        ws.send(JSON.stringify({
-            "C": "d-34DA4CAC-B,C37|fP,46|fQ,0|fR,3|F,7445",
-            "M": [{
-                "H": "miniGameXocXocHub",
-                "M": "currentRoomsInfo",
-                "A": [[{
-                    "BetType": 1,
-                    "TotalAccount1": 37,
-                    "TotalBetValue1": 12246450,
-                    "TotalAccount2": 31,
-                    "TotalBetValue2": 30578000,
-                    "IsChanged": true
-                }]]
-            }]
-        }));
-    });
+        });
+    } /*else if (pathname.startsWith("/xocxoc/")) {
+        ws.on('message', function (message) {
+            let json = JSON.parse(message);
+            if (json.M === 'getCurrentRooms') {
+                ws.send(JSON.stringify({"C":"d-56B20727-B,85F|CPv,0|CDL,0|CPw,1","S":1,"M":[]}));
+                ws.send(JSON.stringify({"C":"d-56B20727-B,85F|CPv,0|CDL,0|CPw,3|I,510D","G":"225sb9RkjQhvdIrjApHI0dXKTft2CJ93xg48R97yZLLf8rwhcFGqgg9XyCj9n5pbGhQSyocO3ew+yjZalaX6K0gFNlvTSiYT3+zMk+g7qHaK3aIKogIL8N82Zg4Dce3MVnuAMg==","M":[]}));
+                ws.send(JSON.stringify({"C":"d-56B20727-B,85F|CPv,2|CDL,0|CPw,3|I,510D","M":[{"H":"miniGameXocXocHub","M":"currentRoomsInfo","A":[[{"BetType":1,"TotalAccount1":101,"TotalBetValue1":22529000,"TotalAccount2":89,"TotalBetValue2":30922000,"IsChanged":false}]]},{"H":"miniGameXocXocHub","M":"currentSession","A":[{"GameSessionID":3579570,"GameStatus":1,"RemainWaiting":0,"RemainBetting":21,"NextGameSessionID":0}]}]}));
+                ws.send(JSON.stringify({"C":"d-56B20727-B,85F|CPv,3|CDL,0|CPw,3|I,510D","M":[{"H":"miniGameXocXocHub","M":"gameHistory","A":[[{"GameSessionID":3579569,"ChipSum":8,"Chip1":2,"Chip2":2,"Chip3":2,"Chip4":2,"LocationIDWin":2,"ChipNumber":4},{"GameSessionID":3579568,"ChipSum":7,"Chip1":2,"Chip2":2,"Chip3":1,"Chip4":2,"LocationIDWin":1,"ChipNumber":3},{"GameSessionID":3579567,"ChipSum":5,"Chip1":1,"Chip2":2,"Chip3":1,"Chip4":1,"LocationIDWin":1,"ChipNumber":3},{"GameSessionID":3579566,"ChipSum":6,"Chip1":1,"Chip2":2,"Chip3":2,"Chip4":1,"LocationIDWin":2,"ChipNumber":2},{"GameSessionID":3579565,"ChipSum":5,"Chip1":1,"Chip2":1,"Chip3":1,"Chip4":2,"LocationIDWin":1,"ChipNumber":3},{"GameSessionID":3579564,"ChipSum":7,"Chip1":2,"Chip2":1,"Chip3":2,"Chip4":2,"LocationIDWin":1,"ChipNumber":3},{"GameSessionID":3579563,"ChipSum":6,"Chip1":1,"Chip2":2,"Chip3":2,"Chip4":1,"LocationIDWin":2,"ChipNumber":2},{"GameSessionID":3579562,"ChipSum":7,"Chip1":2,"Chip2":1,"Chip3":2,"Chip4":2,"LocationIDWin":1,"ChipNumber":3},{"GameSessionID":3579561,"ChipSum":6,"Chip1":1,"Chip2":2,"Chip3":1,"Chip4":2,"LocationIDWin":2,"ChipNumber":2},{"GameSessionID":3579560,"ChipSum":7,"Chip1":2,"Chip2":1,"Chip3":2,"Chip4":2,"LocationIDWin":1,"ChipNumber":3},{"GameSessionID":3579559,"ChipSum":4,"Chip1":1,"Chip2":1,"Chip3":1,"Chip4":1,"LocationIDWin":2,"ChipNumber":4},{"GameSessionID":3579558,"ChipSum":8,"Chip1":2,"Chip2":2,"Chip3":2,"Chip4":2,"LocationIDWin":2,"ChipNumber":4},{"GameSessionID":3579557,"ChipSum":7,"Chip1":2,"Chip2":2,"Chip3":1,"Chip4":2,"LocationIDWin":1,"ChipNumber":3},{"GameSessionID":3579556,"ChipSum":4,"Chip1":1,"Chip2":1,"Chip3":1,"Chip4":1,"LocationIDWin":2,"ChipNumber":4},{"GameSessionID":3579555,"ChipSum":8,"Chip1":2,"Chip2":2,"Chip3":2,"Chip4":2,"LocationIDWin":2,"ChipNumber":4},{"GameSessionID":3579554,"ChipSum":6,"Chip1":2,"Chip2":1,"Chip3":1,"Chip4":2,"LocationIDWin":2,"ChipNumber":2},{"GameSessionID":3579553,"ChipSum":6,"Chip1":1,"Chip2":1,"Chip3":2,"Chip4":2,"LocationIDWin":2,"ChipNumber":2},{"GameSessionID":3579552,"ChipSum":6,"Chip1":1,"Chip2":2,"Chip3":2,"Chip4":1,"LocationIDWin":2,"ChipNumber":2},{"GameSessionID":3579551,"ChipSum":6,"Chip1":1,"Chip2":2,"Chip3":1,"Chip4":2,"LocationIDWin":2,"ChipNumber":2},{"GameSessionID":3579550,"ChipSum":5,"Chip1":1,"Chip2":1,"Chip3":2,"Chip4":1,"LocationIDWin":1,"ChipNumber":3}]]}]}));
+                ws.send(JSON.stringify({"C":"d-56B20727-B,85F|CPv,4|CDL,0|CPw,3|I,510D","M":[{"H":"miniGameXocXocHub","M":"betOfAccount","A":[[],-1]}]}));
+                ws.send(JSON.stringify({"C":"d-56B20727-B,85F|CPv,5|CDL,0|CPw,3|I,510D","M":[{"H":"miniGameXocXocHub","M":"resultOfDragon","A":[{"IsWin":false,"count":0}]}]}));
+            }
+            ws.send(JSON.stringify({"C":"d-56B20727-B,85F|CPv,5|CDL,0|CPw,3|I,510E","M":[{"H":"miniGameXocXocHub","M":"currentRoomsInfo","A":[[{"BetType":1,"TotalAccount1":106,"TotalBetValue1":22767000,"TotalAccount2":89,"TotalBetValue2":30922000,"IsChanged":true}]]}]}));
+        });
+    } else if(pathname.startsWith("/chat1/")){
+        ws.send(JSON.stringify({"C":"d-56B20727-B,85F|CPv,0|CDL,0|CPw,1","S":1,"M":[]}));
+    }*/
 });
