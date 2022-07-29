@@ -1,9 +1,11 @@
-# Node Hello World
+# Node Websocket
 
-Simple node.js app that servers "hello world"
+LamThinh WS
 
-Great for testing simple deployments to the cloud
+## Run commands
 
-## Run It
-
+`npm install`
+<br/>
+Then
+<br/>
 `npm start`
