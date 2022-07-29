@@ -1,7 +1,7 @@
 var http = require('http');
 const WebSocket = require('ws');
+const user = require('./data/user.json');
 
-var wss = require('./txWs');
 console.log("Server started");
 const WebSocketServer = require('ws').Server;
 // client
@@ -10,7 +10,7 @@ const headers = {
     'Accept-Language': 'en-US,en;q=0.9',
     'Cache-Control': 'no-cache',
     'Connection': 'Upgrade',
-    Cookie: '_ga=GA1.1.639045066.1659105634; .fanvip=B75E3970C2DC1D0BA8A869CD9E5E189A169D254226D221C8469231CBC95B3071018EF9F037CD10E35604E18199B9DE43BDCFEA832FEA8123D6D5DA957648D715388C8484BD619419AE7B1236276506103B596C4EA0770652F3E68FF3DC6F03378DCE8A5D7F4CDA10399FCF1F56CCA165BEB9C6F05FC4E8D62E444E3A4DBC7EEB2107692D68A8C56F97B5C113ED3F9CCC8486D0DF8666789ECA5548F56F8D2EBC822F80DF78D88924CEF29EF6FA0FEAF225C9E71DC304117A03CEECCB9A07DB067DDB87B58D37B366A3943FC30771253B06D60FA6E347D311B12045C77281207787B4768FE662F16FF9867DD158C3255D9853BBB40DD409764CF7DE54925C37705A88BE5CFD51C14858C48290C82BE57BF0CE8AA653BAD234AC33605CEACB482518BDE5AD360D5694516A80D929621B660331BCE142A40CC24FDE635B9EB3FF021D6229846D47AE4BF04FD441128D4A2A607430E4BD5AE2F43B6AFE2791ABBBB83EC0EB0F65981D027A1D8B42427B1815511841DC932F6BC0FE06F40C0F12E71AD8CED160AA52D859420AC94AF69936DADF74CA38C549540F74B3AC5DB8F080567BC5BDC859F1E800E92B0DE6EECAED69F2604CFE69F0A0A6EF60BB2735052C9C272798E2764055AF764929598297E9064828C39688CEC29D7688ABA7284A2365323C6EF8AC9DFD2D47BC1FE4106DA2DFB4525F9D0A95C65D8EE1FE7E8BB00C677452AE841E754A13F1EB5E26BF4188386D18ED3BC5871DA424A989CE37902A4BABAC6CD5EE0C4A89B8CC8ADD0BAA07E123947A7DEB906D1D9F00033241559E220CE875FFD936D3468900C8416D8E6D1755B71A19B7A73229AADE3AA432546AC4CF8DBBF702D9F072942B880E2F09DF4B15FC7DEC39430290592746FCA2267C568EDA02481F403045FE3C1F629F3907B25EC3932AD097BF1A006EE68EF8E1D613D263BA6808FA651111D787C585A0F52CF69E23D3CB55EF93CCE89E1D1F0D7EED7D54D515C32E3C950E48FD46207645642032F2AB; _ga_J65JDTR6Z7=GS1.1.1659105633.1.1.1659106113.0; _ga_20FD88L456=GS1.1.1659105633.1.1.1659106113.0',
+    Cookie: user.cookie,
     Host: 'bayvip.net',
     Origin: 'https://bayvip.net',
     Pragma: 'no-cache',
@@ -20,6 +20,9 @@ const headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
 };
 var fwWs = new WebSocketServer({noServer: true});
+var chatWs = new WebSocketServer({noServer: true});
+var ronghoWs = new WebSocketServer({noServer: true});
+var xocxocWs = new WebSocketServer({noServer: true});
 fwWs.on("connection", function (ws, req) {
     const url = req.url;
     if (!url.startsWith('/tx/')) {
@@ -39,13 +42,17 @@ fwWs.on("connection", function (ws, req) {
     wsCli.on('message', function message(data) {
         console.log('Receive forward: %s', data);
         ws.send(data.toString());
+        if(data.toString().indexOf('currentResult') > 0) {
+            var result = JSON.parse(data.toString());
+            console.log("----------------------RESULT----------------------------");
+            console.log(result.M[0].M);
+        }
     }, ws);
 });
-var chatWs = new WebSocketServer({noServer: true});
 chatWs.on("connection", function (ws, req) {
     const url = req.url;
     console.log('Client connected to CHAT with URL: ' + req.url);
-    const wsCli = new WebSocket('wss://bayvip.net/chat1/signalr/connect?transport=webSockets&clientProtocol=1.5&connectionToken=L3g6bgtGfm4%2Fnq8bvb41DE0GBGhnrTP9QAyuZTWm0MS6va9%2BY4DBsZ6327r76Zl%2BfUbev4j1WFGZd9dK%2FIZZPsOk%2BAC5x4awn3caIQMDiUwihMUuQjYoZd1aPZDiW6p0%2FmeLtYClts6JHy%2FqIPRp%2BLPiblzJ96eOiYUgO5RdFfgYDoTrgZHPwGihKr2bVjEpR2%2BJrZwrPBKvSJVfdS2zXbhoe%2BwScJUpWU6zJ4QnuKF7efOryh3y9x%2B5uYGtxgMxZ6PR6qg4GVGEzUuDhaNtVZlDgT7DXFzQ9VR9WHY7JQQT9b8wz1orNtbVNGvSD%2BkLWIJle6oV5csVYOpbx8fILpNvvxZTvs2x5hby8b8OjPUhLY2beCrvqLof9u6tX25b%2F%2Fm%2Bc77zN0f%2FuhXXIcVDUksUzwIV3XVNGOtMZKGTLqDj%2BcubAZrTb%2FIYpuDzGo4W%2FSPHjcSgeSFyC%2F1YSHv7yUWwReEgpbXW2aX2nQRhbQdvd8l%2FmXgvbxbaw4rE%2BJaCulJRAcQzV%2FyBKYssxgWwoT4O%2FSQ%3D&connectionData=%5B%7B%22name%22%3A%22chathub%22%7D%5D&tid=7',
+    const wsCli = new WebSocket('wss://bayvip.net/chat1/signalr/connect?transport=webSockets&clientProtocol=1.5&connectionToken=ZvfeQ%2BfJRs%2FR%2BYv5R8CVeQdKlA5K9VYdLr5Hl%2Ba6jyxocsnt9se%2FKqZ%2BUnk3aBujzvEybB%2FoP1xXR6gsNsCZUmgbWzTUlZnoM3cNFFrmt2V6IKztvrTzObBU4weAvui4ltgC29W5oVssJDwjMASsqgp30ZzaSpB7cuH80zR8btUylTQAg8gRfHYOm6OmUmPq%2BU6It2%2BXLhTSGIv9BRDEb%2BDJNPPxD7Da4zqUnUaDgzgytTxBy44eMgzs0ww8Pk7K5ST8qdWZLq6PUuqxoVPwOlUwmGJAfEuXA1i45w2wPT5MIl%2FC0XiL7H9YhBhstaJyQkp9Tk7QiWXbZVk0NTKPf%2B2fAVWfVZjdiS6Et9IQKZ5AozYz4jYZTLvPrvmuAYfBtfydMaimIIX2gnxIBqr%2Bf4HVFC83FkuUrosXDzW2JR%2FFKHg5Cbjns%2BKj1F%2FfiMua3Ccx%2BS8oljojVQthiEUI%2FUQc7T5L6AWUB7JrZZURNTh1kacQvDF1A3mynTJ5wyS28CDCHkV5vnRZMoT%2BpBmzRHMTyAY%3D&connectionData=%5B%7B%22name%22%3A%22chathub%22%7D%5D&tid=7',
         {headers});
     wsCli.on('open', function () {
         console.log("CLIENT CHAT CONNECTED......");
@@ -59,7 +66,6 @@ chatWs.on("connection", function (ws, req) {
         ws.send(data.toString());
     }, ws);
 });
-var ronghoWs = new WebSocketServer({noServer: true});
 ronghoWs.on("connection", function (ws, req) {
     const url = req.url;
     console.log('Client connected to RONGHO with URL: ' + req.url);
@@ -77,7 +83,6 @@ ronghoWs.on("connection", function (ws, req) {
         ws.send(data.toString());
     }, ws);
 });
-var xocxocWs = new WebSocketServer({noServer: true});
 xocxocWs.on("connection", function (ws, req) {
     const url = req.url;
     console.log('Client connected to XOCXOC with URL: ' + req.url);
